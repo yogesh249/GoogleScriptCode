@@ -22,8 +22,11 @@ function onOpen() {
 }
 function testMethod()      
 { 
-    var cls = findRowNumberInConsolidatedFD('Tax Saving FD');
-    var x2=1;
+// Some how it is not copying values from B43 to other cells.. It is only showing loading...
+// Need to check this...
+
+// Don't know how it started working automatically again..
+    copyValues('B43', 'C43')
 }
 function getColumns(sheetName)
 {
@@ -86,14 +89,14 @@ function fillNetValues() {
     var secondRow = firstRow + 1;
     var thirdRow = firstRow + 2;
 
-    var lastFilledDate = settingsSheet.getRange(dateColumn + (lastRow - 1));
+    /*var lastFilledDate = settingsSheet.getRange(dateColumn + (lastRow - 1));
     var milliseconds = (new Date() - lastFilledDate.getValue());
     diffInDays = milliseconds / (1000 * 60 * 60 * 12);
 
     // If this value has been filled, then just return...
     if (diffInDays < 1) {
         //return;
-    }
+    }*/
     settingsSheet.getRange(dateColumn + lastRow).setValues([
         [new Date()]
     ]);
@@ -145,7 +148,7 @@ function copyValues(srcCell, targetCell) {
     var row = settingsSheet.getRange(srcCell);
     var targetRange = settingsSheet.getRange(targetCell);
     // Set value  is no longer working, now we can use copyTo function.
-    //settingsSheet.getRange(targetCell).setValue(row.getValues());
+//    settingsSheet.getRange(targetCell).setValue(row.getValues());
     row.copyTo(targetRange, {
         contentsOnly: true
     });
@@ -159,12 +162,10 @@ function findEmptyRow(range) {
     var lastRow = 1;
     var foundEmptyRow = false;
     for (var i = 1; i < results.length; i++) {
-       // for (var j = 0; j < 500; j++) {
             if (results[i][0].toString().length == 0) {
                 foundEmptyRow = true;
                 break;
             }
-     //   }
         if (foundEmptyRow == true)
             break;
     }
@@ -209,7 +210,16 @@ function findRowNumberInConsolidatedFD(text) {
         }
     }
 }
-
+/*function findColumn(range, text, sheetName) {
+    var spreadsheet = SpreadsheetApp.getActive();
+    var settingsSheet = spreadsheet.getSheetByName(sheetName);
+    var results = settingsSheet.getRange(range).getValues();
+    for (var i = 0; i < 26; i++) {
+        if (results[0][i].toString() == text) {
+            return columnToLetter(i + 1);
+        }
+    }
+}*/
 
 function findColumn(text) {
     for (var i = 0; i < 26; i++) {
@@ -228,3 +238,90 @@ function columnToLetter(column) {
     }
     return letter;
 }
+
+/*
+
+function EvaluateWhereToPutExtraInvestment(sheetName) {
+    var spreadsheet = SpreadsheetApp.getActive();
+    var settingsSheet = spreadsheet.getSheetByName(sheetName);
+    var amortization = spreadsheet.getSheetByName("Amortization Schedule");
+    //amortization.getRange("J5").setFormula("=\"Yes\"");
+    amortization.getRange("J5").setValue("No");
+    SpreadsheetApp.flush();
+    // Case 1: Put additional Investment in Retirement
+
+    var range = findRowNumber("A1:A50", "Any additional investment", "Retirement Plan");
+    var cell = settingsSheet.getRange("C" + range);
+    var interestRowNum = findRowNumber("A1:A50", "Annual Interest assumed", "Retirement Plan");
+    var yearsToRetireRowNum = findRowNumber("A1:A50", "Years to retire", "Retirement Plan");
+    var monthlyContributionRequiredRowNum = findRowNumber("D1:D50", "Monthly contribution required", "Retirement Plan");
+
+    cell.setFormula("='Amortization Schedule'!$G$14");
+    SpreadsheetApp.flush();
+    var range2 = findRowNumber("D1:D50", "Any additional investment", "Retirement Plan");
+    var cell2 = settingsSheet.getRange("F" + range2);
+    cell2.setFormula("=0");
+    SpreadsheetApp.flush();
+    settingsSheet.getRange("B24").setFormula("=B" + monthlyContributionRequiredRowNum + "*B" + yearsToRetireRowNum + "*12");
+    SpreadsheetApp.flush();
+    settingsSheet.getRange("B24").copyTo(settingsSheet.getRange("B24"), {
+        contentsOnly: true
+    });
+    SpreadsheetApp.flush();
+    settingsSheet.getRange("E24").setFormula("=E" + monthlyContributionRequiredRowNum + "*E" + yearsToRetireRowNum + "*12");
+    SpreadsheetApp.flush();
+    settingsSheet.getRange("E24").copyTo(settingsSheet.getRange("E24"), {
+        contentsOnly: true
+    });
+    amortization.getRange("C13").copyTo(settingsSheet.getRange("G24"), {
+        contentsOnly: true
+    });
+    SpreadsheetApp.flush();
+    // Case 2: Push your extra investment to Child marriage.
+    cell.setFormula("=0");
+    SpreadsheetApp.flush();
+    var interestRowNum2 = findRowNumber("A1:A50", "Annual Interest assumed", "Retirement Plan");
+    var yearsToRetireRowNum2 = findRowNumber("A1:A50", "Years to retire", "Retirement Plan");
+    cell2.setFormula("='Amortization Schedule'!$G$14");
+    settingsSheet.getRange("B29").setFormula("=B" + monthlyContributionRequiredRowNum + "*B" + yearsToRetireRowNum + "*12");
+    SpreadsheetApp.flush();
+    settingsSheet.getRange("B29").copyTo(settingsSheet.getRange("B29"), {
+        contentsOnly: true
+    });
+    settingsSheet.getRange("E29").setFormula("=E" + monthlyContributionRequiredRowNum + "*E" + yearsToRetireRowNum + "*12");
+    SpreadsheetApp.flush();
+    settingsSheet.getRange("E29").copyTo(settingsSheet.getRange("E29"), {
+        contentsOnly: true
+    });
+    amortization.getRange("C13").copyTo(settingsSheet.getRange("G29"), {
+        contentsOnly: true
+    });
+
+    // Case 3: If I make the downpayment for home loan
+    cell.setFormula("=0");
+    cell2.setFormula("=0");
+    SpreadsheetApp.flush();
+    amortization.getRange("J5").setValue("No");
+    settingsSheet.getRange("B34").setFormula("=B" + monthlyContributionRequiredRowNum + "*B" + yearsToRetireRowNum + "*12");
+    SpreadsheetApp.flush();
+    settingsSheet.getRange("B34").copyTo(settingsSheet.getRange("B34"), {
+        contentsOnly: true
+    });
+    settingsSheet.getRange("E34").setFormula("=E" + monthlyContributionRequiredRowNum + "*E" + yearsToRetireRowNum + "*12");
+    SpreadsheetApp.flush();
+    settingsSheet.getRange("E34").copyTo(settingsSheet.getRange("E34"), {
+        contentsOnly: true
+    });
+    amortization.getRange("C13").copyTo(settingsSheet.getRange("G34"), {
+        contentsOnly: true
+    });
+
+    // After everything is done, restore the actual values
+    cell.setFormula("='Amortization Schedule'!$G$14");
+    cell2.setFormula("=0");
+    
+    amortization.getRange("J5").setValue("No");
+    SpreadsheetApp.flush();
+}
+
+*/
