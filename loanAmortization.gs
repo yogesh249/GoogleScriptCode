@@ -2,8 +2,9 @@
  * A special function that runs when the spreadsheet is open, used to add a
  * custom menu to the spreadsheet.
  */
+var spreadsheet = SpreadsheetApp.getActive();
 function onOpen() {
-    var spreadsheet = SpreadsheetApp.getActive();
+    
     var menuItems = [{
         name: 'Fill Net Values',
         functionName: 'fillNetValues'
@@ -30,7 +31,7 @@ function testMethod()
 }
 function getColumns(sheetName)
 {
-    var spreadsheet = SpreadsheetApp.getActive();
+    
     var settingsSheet = spreadsheet.getSheetByName(sheetName);
     var columns = new Array(26);
     // Iterate from A1 to Z1
@@ -42,7 +43,7 @@ function getColumns(sheetName)
 }
 function getRows(sheetName)
 {
-    var spreadsheet = SpreadsheetApp.getActive();
+   
     var settingsSheet = spreadsheet.getSheetByName(sheetName);
     var rows = new Array(60);
     // Iterate from A1 to Z1
@@ -143,7 +144,7 @@ function fillNetValues() {
 
 
 function copyValues(srcCell, targetCell) {
-    var spreadsheet = SpreadsheetApp.getActive();
+   
     var settingsSheet = spreadsheet.getSheetByName('Consolidated FDs');
     var row = settingsSheet.getRange(srcCell);
     var targetRange = settingsSheet.getRange(targetCell);
@@ -156,7 +157,7 @@ function copyValues(srcCell, targetCell) {
 }
 
 function findEmptyRow(range) {
-    var spreadsheet = SpreadsheetApp.getActive();
+    
     var settingsSheet = spreadsheet.getSheetByName('Consolidated FDs');
     var results = settingsSheet.getRange(range).getValues();
     var lastRow = 1;
@@ -174,7 +175,7 @@ function findEmptyRow(range) {
 }
 
 function findEmptyRowFromSheet(range, sheetName) {
-    var spreadsheet = SpreadsheetApp.getActive();
+   
     var settingsSheet = spreadsheet.getSheetByName(sheetName);
     var results = settingsSheet.getRange(range).getValues();
     var lastRow = 1;
@@ -191,7 +192,7 @@ function findEmptyRowFromSheet(range, sheetName) {
     return lastRow;
 }
 function findRowNumber(range, text, sheetName) {
-    var spreadsheet = SpreadsheetApp.getActive();
+   
     var settingsSheet = spreadsheet.getSheetByName(sheetName);
     var results = settingsSheet.getRange(range).getValues();
     for (var i = 0; i < results.length; i++) {
